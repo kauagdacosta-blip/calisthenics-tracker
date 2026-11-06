@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101114">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Calistenia — Meu Treino</title>
+<style>
+:root{color-scheme:dark;--bg:#101114;--panel:#1a1c21;--panel2:#22252c;--line:#30343d;--text:#f3f4f6;--muted:#a5aab5;--accent:#a3e635;--accent2:#365314}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{padding:28px 18px 20px;background:linear-gradient(145deg,#20251b,#111318 65%);border-bottom:1px solid var(--line)}
+.wrap{max-width:760px;margin:auto}h1{font-size:27px;margin:5px 0 4px}h2{font-size:20px;margin:0 0 12px}.eyebrow{color:var(--accent);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}.sub{color:var(--muted);margin:0}
+main{padding:18px;display:grid;gap:16px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}.stat{background:#171a1f;border:1px solid var(--line);border-radius:12px;padding:10px}.stat b{display:block;font-size:18px}.stat span{font-size:11px;color:var(--muted)}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.tab,button{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:11px 8px;border-radius:12px;font-weight:700;cursor:pointer}.tab.active{background:var(--accent2);border-color:#84cc16;color:#ecfccb}
+.daytitle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}.tag{font-size:11px;color:var(--accent);background:#263315;padding:5px 8px;border-radius:99px}
+.exercise{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--line)}.exercise:last-child{border:0}.exercise input{width:21px;height:21px;accent-color:#a3e635;margin:3px 0 0}.exercise b{display:block}.exercise small{display:block;color:var(--muted);margin-top:3px}
+.progress{height:9px;border-radius:99px;background:#30343d;overflow:hidden;margin:10px 0}.bar{height:100%;width:0;background:var(--accent);transition:width .2s}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.primary{background:var(--accent);color:#17210a;border-color:var(--accent)}.quiet{color:var(--muted)}.timer{display:flex;align-items:center;justify-content:space-between;gap:12px}.time{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums}.timer-controls{display:flex;gap:7px}.timer-controls button{min-width:48px}
+textarea{width:100%;min-height:75px;resize:vertical;background:#111318;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:11px;font:inherit}
+.notice{color:var(--muted);font-size:13px}.footer{text-align:center;color:var(--muted);font-size:12px;padding:4px 18px 24px}
+@media(min-width:650px){main{grid-template-columns:1fr 1fr}.wide{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<div class="eyebrow">Plano pessoal • sem equipamentos</div>
+<h1>Meu treino de calistenia</h1>
+<p class="sub">Construa força e resistência, um treino de cada vez.</p>
+<div class="stats">
+<div class="stat"><b>4 dias</b><span>por semana</span></div>
+<div class="stat"><b>25–40 min</b><span>por sessão</span></div>
+<div class="stat"><b>Iniciante</b><span>progressão gradual</span></div>
+</div>
+</div></header>
+<main class="wrap">
+<section class="card wide">
+<h2>Seu calendário</h2>
+<div class="tabs" id="tabs">
+<button class="tab active" data-day="0">Seg</button><button class="tab" data-day="1">Ter</button><button class="tab" data-day="2">Qui</button><button class="tab" data-day="3">Sáb</button>
+</div>
+<p class="notice" style="margin:12px 0 0">Quarta, sexta e domingo: recuperação, descanso ou caminhada leve.</p>
+</section>
+<section class="card">
+<div class="daytitle"><h2 id="dayName">Segunda — Superior A</h2><span class="tag" id="dayFocus">Parte superior</span></div>
+<p class="notice">Marque cada exercício quando terminar. Faça os movimentos controlados e descanse 60–90 segundos entre as séries.</p>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<p class="notice" id="count">0 de 4 exercícios concluídos</p>
+<div id="exerciseList"></div>
+<div class="actions"><button class="primary" id="finish">Concluir treino</button><button id="clear">Desmarcar dia</button></div>
+</section>
+<section class="card">
+<h2>Descanso entre séries</h2>
+<div class="timer"><div><div class="time" id="clock">01:00</div><div class="notice">Temporizador de descanso</div></div>
+<div class="timer-controls"><button id="minus">−</button><button id="start" class="primary">Iniciar</button><button id="plus">+</button></div></div>
+<p class="notice">Ajuste o tempo conforme precisar. Não tenha pressa para começar a próxima série.</p>
+</section>
+<section class="card wide">
+<h2>Meu acompanhamento</h2>
+<div class="stats">
+<div class="stat"><b id="weekDone">0/4</b><span>treinos marcados</span></div>
+<div class="stat"><b id="totalDone">0</b><span>treinos registrados</span></div>
+<div class="stat"><b id="streak">0</b><span>dias de treino nesta semana</span></div>
+</div>
+<p class="notice">Os registros ficam salvos neste navegador, neste aparelho.</p>
+</section>
+<section class="card wide">
+<h2>Anotações</h2>
+<textarea id="notes" placeholder="Ex.: como me senti, repetições que consegui, dúvidas para o próximo treino..."></textarea>
+<p class="notice">Suas anotações são salvas automaticamente neste aparelho.</p>
+</section>
+<section class="card wide">
+<h2>Como progredir com segurança</h2>
+<p class="notice">Nas primeiras semanas, foque em aprender a técnica e terminar as séries sem chegar à exaustão. Quando o exercício ficar confortável e bem controlado, aumente poucas repetições. Depois, considere uma série extra. Não aumente tudo de uma vez.</p>
+<p class="notice">Aqueça por cerca de 5 minutos. Pare se sentir dor, tontura ou mal-estar. Se a técnica se perder, encerre a série. Descanse e mantenha alimentação e sono adequados.</p>
+</section>
+</main>
+<div class="footer">Feito para acompanhar sua rotina • Você consegue ajustar o ritmo.</div>
+<script>
+const plan=[
+{name:"Segunda — Superior A",focus:"Peito, ombros e core",items:[
+["Flexão tradicional","2 séries de 4–6 repetições; pare antes de perder a técnica."],
+["Flexão inclinada","2 séries de 6–8 repetições, usando uma superfície firme."],
+["Elevação de braços em Y-T","2 séries de 8 repetições, deitado de bruços."],
+["Prancha","2 séries de 15–20 segundos."]
+]},
+{name:"Terça — Inferior A",focus:"Pernas e abdômen",items:[
+["Agachamento","2 séries de 10–12 repetições."],
+["Elevação pélvica","2 séries de 12 repetições."],
+["Afundo para trás","2 séries de 6 repetições por perna; segure numa parede se precisar de equilíbrio."],
+["Dead Bug","2 séries de 8 repetições por lado."]
+]},
+{name:"Quinta — Superior B",focus:"Parte superior e estabilidade",items:[
+["Flexão tradicional ou inclinada","2 séries de 4–6 repetições; escolha a versão com boa técnica."],
+["Bird Dog","2 séries de 8 repetições por lado."],
+["Superman adaptado","2 séries de 8 repetições suaves, sem forçar a lombar."],
+["Prancha com joelhos apoiados","2 séries de 15–20 segundos."]
+]},
+{name:"Sábado — Inferior B",focus:"Pernas e core",items:[
+["Agachamento sumô","2 séries de 10 repetições."],
+["Elevação de panturrilha","2 séries de 12 repetições."],
+["Ponte com marcha","2 séries de 8 repetições por lado; faça a ponte normal se ficar difícil."],
+["Abdominal reverso","2 séries de 8 repetições."]
+]}
+];
+let current=0, seconds=60, interval=null;
+const key='calisteniaTrackerV1';
+let data={checks:{},completed:[],notes:''};
+try{data={...data,...JSON.parse(localStorage.getItem(key)||'{}')}}catch(e){}
+function save(){try{localStorage.setItem(key,JSON.stringify(data))}catch(e){}}
+function render(){
+ const p=plan[current], checks=data.checks[current]||[];
+ document.getElementById('dayName').textContent=p.name;
+ document.getElementById('dayFocus').textContent=p.focus;
+ const list=document.getElementById('exerciseList');list.innerHTML='';
+ p.items.forEach((it,i)=>{
+  const row=document.createElement('label');row.className='exercise';
+  const cb=document.createElement('input');cb.type='checkbox';cb.checked=checks.includes(i);
+  cb.addEventListener('change',()=>{let a=data.checks[current]||[];data.checks[current]=cb.checked?[...a,i]:a.filter(x=>x!==i);save();render();});
+  const wrap=document.createElement('span');const b=document.createElement('b');b.textContent=it[0];const sm=document.createElement('small');sm.textContent=it[1];wrap.append(b,sm);row.append(cb,wrap);list.append(row);
+ });
+ const n=checks.length;document.getElementById('count').textContent=`${n} de ${p.items.length} exercícios concluídos`;
+ document.getElementById('bar').style.width=(n/p.items.length*100)+'%';
+ document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',i===current));
+ updateStats();
+}
+function updateStats(){
+ document.getElementById('weekDone').textContent=`${data.completed.length}/4`;
+ document.getElementById('totalDone').textContent=String(data.total||0);
+ document.getElementById('streak').textContent=String(data.completed.length);
+}
+document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-day]');if(!b)return;current=+b.dataset.day;render()});
+document.getElementById('clear').onclick=()=>{data.checks[current]=[];save();render()};
+document.getElementById('finish').onclick=()=>{
+ const checks=data.checks[current]||[];
+ if(checks.length!==plan[current].items.length){alert('Marque todos os exercícios deste dia antes de concluir. Se precisou adaptar ou pular algum, tudo bem: priorize sua segurança.');return;}
+ if(!data.completed.includes(current)){data.completed.push(current);data.total=(data.total||0)+1;}
+ save();updateStats();alert('Treino registrado. Bom trabalho! Lembre-se de descansar.');
+};
+function showTime(){document.getElementById('clock').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0')}
+document.getElementById('start').onclick=()=>{if(interval){clearInterval(interval);interval=null;document.getElementById('start').textContent='Continuar';return}
+ document.getElementById('start').textContent='Pausar';interval=setInterval(()=>{if(seconds>0){seconds--;showTime()}else{clearInterval(interval);interval=null;document.getElementById('start').textContent='Iniciar';}},1000)};
+function adjust(v){seconds=Math.max(0,Math.min(599,seconds+v));showTime()}
+document.getElementById('minus').onclick=()=>adjust(-15);document.getElementById('plus').onclick=()=>adjust(15);
+document.getElementById('notes').value=data.notes||'';
+document.getElementById('notes').addEventListener('input',e=>{data.notes=e.target.value;save()});
+render();showTime();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+}
+</script>
+</body></html>
